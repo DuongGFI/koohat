@@ -39,7 +39,7 @@ npm run install:all && npm run build && npm start
 Muốn chạy bền bỉ (tự khởi động lại): xem mục pm2 ở dưới.
 
 ### Cách dùng sau khi mở app
-1. **Tổ chức** → vào Quản lý câu hỏi: import Excel/CSV (có file mẫu), hoặc dán link Koohat/Kahoot công khai, hoặc nhập tay → chỉnh cấu hình phòng → **Bắt đầu tổ chức**.
+1. **Tổ chức** → vào Quản lý câu hỏi, tạo câu hỏi theo **1 trong 2 cách**: (a) tải file Excel/CSV lên (có sẵn file mẫu để tải về điền), hoặc (b) dán link Kahoot công khai → chỉnh cấu hình phòng → **Bắt đầu tổ chức**.
 2. Người chơi mở trang chủ → **Tham gia chơi**, nhập mã PIN + biệt danh + chọn avatar (hoặc quét QR).
 3. Host bấm **Bắt đầu** và điều khiển từng câu.
 
@@ -111,7 +111,7 @@ kahoot_local/
 │       ├── index.js          # bootstrap: Express REST + wiring Socket.IO + detectLanIp()
 │       ├── rooms.js          # Room + RoomManager + STATE machine  ← TRÁI TIM hệ thống
 │       ├── scoring.js        # computeScore(): điểm + cược (thuần, dễ unit-test)
-│       ├── questions.js      # import: Excel/CSV (.xlsx/.csv) + Google Sheets + Kahoot
+│       ├── questions.js      # import câu hỏi: Excel/CSV (.xlsx/.csv) + link Kahoot
 │       └── pin.js            # sinh mã PIN 6 số
 └── client/                   # React + Vite + Tailwind + Framer Motion
     ├── public/
@@ -244,9 +244,11 @@ Không trả lời:  delta = 0, không phạt
 
 ---
 
-## 7. Import câu hỏi (`server/src/questions.js`)
+## 7. Tạo câu hỏi (`server/src/questions.js`)
 
-Cấu trúc cột (header, không phân biệt hoa thường, hỗ trợ alias Việt/Anh — xem `HEADER_ALIASES`):
+Có **2 cách** nạp câu hỏi vào phòng (xem trang Admin):
+
+**Cách 1 — Tải file lên (Excel/CSV).** Cấu trúc cột (header, không phân biệt hoa thường, hỗ trợ alias Việt/Anh — xem `HEADER_ALIASES`):
 
 | Câu hỏi | Đáp án A | Đáp án B | Đáp án C | Đáp án D | Đáp án đúng | Thời gian |
 |---------|----------|----------|----------|----------|-------------|-----------|
@@ -255,9 +257,9 @@ Cấu trúc cột (header, không phân biệt hoa thường, hỗ trợ alias V
 - **Đáp án đúng**: A/B/C/D hoặc 1–4.
 - **Thời gian**: giây, tùy chọn (mặc định 20).
 - **File mẫu:** `client/public/mau-cau-hoi.csv` (BOM UTF-8 để Excel mở đúng tiếng Việt), tải tại link "⬇ Tải file mẫu" trong trang Admin (URL `/mau-cau-hoi.csv`). Người dùng tải về, điền câu hỏi rồi import lại.
-- Excel/CSV: `POST /api/import/excel` (multipart, field `file`). Endpoint chấp nhận cả `.xlsx`, `.xls`, `.csv` — thư viện `xlsx` (SheetJS) tự nhận dạng định dạng.
-- Google Sheets: `POST /api/import/sheets` `{url}` → đổi URL thành link CSV export (`toCsvExportUrl`), fetch, parse. Sheet phải chia sẻ **"Anyone with the link"**. Không cần API key.
-- **Kahoot**: `POST /api/import/kahoot` `{url}` → trích UUID từ link share (`extractKahootUuid`), fetch `https://create.kahoot.it/rest/kahoots/<uuid>` (endpoint công khai không chính thức), map qua `mapKahootQuiz`. Trả thêm `{title, skipped, total}`. **Chỉ nhập câu `type:"quiz"` (1 đáp án đúng)** — slide/survey/open-ended/jumble/multi-select bị bỏ qua và đếm vào `skipped`. Text được strip HTML, `time(ms)→giây`, choices pad/cắt về đúng 4 (true/false → 2 đáp án + 2 ô trống). Chỉ chạy với Kahoot công khai (visible); private trả 401/403.
+- API: `POST /api/import/excel` (multipart, field `file`). Endpoint chấp nhận cả `.xlsx`, `.xls`, `.csv` — thư viện `xlsx` (SheetJS) tự nhận dạng định dạng.
+
+**Cách 2 — Dán link Kahoot công khai.** `POST /api/import/kahoot` `{url}` → trích UUID từ link share (`extractKahootUuid`), fetch `https://create.kahoot.it/rest/kahoots/<uuid>` (endpoint công khai không chính thức), map qua `mapKahootQuiz`. Trả thêm `{title, skipped, total}`. **Chỉ nhập câu `type:"quiz"` (1 đáp án đúng)** — slide/survey/open-ended/jumble/multi-select bị bỏ qua và đếm vào `skipped`. Text được strip HTML, `time(ms)→giây`, choices pad/cắt về đúng 4 (true/false → 2 đáp án + 2 ô trống). Chỉ chạy với Kahoot công khai (visible); private trả 401/403.
 - REST chỉ *parse và trả JSON*; việc nạp vào phòng do client gọi tiếp `host:loadQuestions`.
 - **Lưu ý validation:** `Admin.jsx::startHosting` chấp nhận câu có **≥2 đáp án** không rỗng và đáp án đúng không rỗng (để hỗ trợ true/false từ Kahoot), không bắt buộc đủ 4 như trước.
 
@@ -321,7 +323,7 @@ cd server && node e2e-test.mjs       # 21 assertion: tạo phòng, join, avatar,
 - ✅ Đang chạy ổn định dưới pm2: app `kahoot-local`, cổng 1234, `instances:1 fork`, đã `pm2 save`.
 - ✅ Build client thành công, server phục vụ `client/dist`.
 - ✅ 21/21 e2e test pass.
-- ✅ Import: Excel/CSV (kéo-thả), Google Sheets, Kahoot (link share công khai); kèm file CSV mẫu tải tại Admin.
+- ✅ Tạo câu hỏi 2 cách: tải file Excel/CSV (kéo-thả, có file mẫu) hoặc dán link Kahoot công khai.
 - ✅ Avatar emoji cho người chơi (chọn theo danh mục hoặc random) — hiện ở namecard sảnh + bảng xếp hạng + màn chờ của người chơi.
 - ✅ Người chơi thấy đề bài ngay từ giai đoạn PRE_QUESTION, và đề bài + chữ đáp án ở ACTIVE_QUESTION.
 - ✅ Ô nhập biệt danh/PIN dùng nền mờ + chữ trắng (tương phản rõ trên nền tối).
