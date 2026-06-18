@@ -1,0 +1,17 @@
+services:
+  koohat:
+    build: .
+    container_name: koohat-local
+    ports:
+      - "1234:1234"
+    environment:
+      - PORT=1234
+      # QUAN TRỌNG cho Docker: trong container, server không tự dò được IP LAN của
+      # MÁY THẬT (nó chỉ thấy IP nội bộ của Docker). Hãy bỏ comment dòng dưới và
+      # điền IP LAN của máy chạy Docker để mã QR trỏ đúng cho điện thoại:
+      # - PUBLIC_HOST=192.168.1.50
+    restart: unless-stopped
+
+# Ghi chú: trên Linux có thể thay phần "ports" bằng "network_mode: host" để server
+# tự dò đúng IP LAN (không cần PUBLIC_HOST). Cách này KHÔNG chạy trên Docker
+# Desktop (macOS/Windows) — ở đó hãy dùng ports + PUBLIC_HOST như trên.

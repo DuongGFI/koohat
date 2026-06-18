@@ -1,0 +1,14 @@
+{
+  "name": "kahoot-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kahoot clone chạy trong mạng LAN: Host trình chiếu, người chơi tham gia bằng điện thoại.",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "test": "cd server && node src/index.js & sleep 1.5 && cd server && node e2e-test.mjs"
+  }
+}

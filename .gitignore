@@ -1,0 +1,10 @@
+node_modules/
+client/dist/
+dist/
+*.log
+.env
+.env.local
+.DS_Store
+.pm2/
+.claude/
+server/server.log
