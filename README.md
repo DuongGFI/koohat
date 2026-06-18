@@ -8,24 +8,34 @@
 
 ## 🚀 Bắt đầu nhanh (cho người dùng)
 
-### Cách 1 — Docker (khuyên dùng, không cần cài Node)
-```bash
-git clone <repo-url> kahoot_local && cd kahoot_local
-docker compose up -d            # build & chạy nền
-# Mở http://localhost:1234 trên máy Host → "Tổ chức"
-```
-- Người chơi cùng mạng LAN vào `http://<IP-LAN-máy-host>:1234` hoặc quét QR.
-- **Lưu ý mã QR khi chạy Docker:** container không tự biết IP LAN của máy thật. Mở `docker-compose.yml`, bỏ comment và điền `PUBLIC_HOST=<IP-LAN-của-bạn>` rồi `docker compose up -d --build` lại — khi đó QR mới trỏ đúng cho điện thoại. (Lấy IP: `hostname -I` trên Linux, `ipconfig` trên Windows.)
-- Dừng: `docker compose down`.
+### ⚡ Chạy bằng 1 dòng (dễ nhất)
+Mở **Terminal** (macOS/Linux) hoặc **PowerShell** (Windows), dán đúng 1 dòng rồi Enter:
 
-### Cách 2 — Chạy bằng Node (cần Node 18+)
+**macOS / Linux**
 ```bash
-git clone <repo-url> kahoot_local && cd kahoot_local
-npm run install:all     # cài deps cho server + client
-npm run build           # build giao diện
-npm start               # chạy server (cổng 1234)
+curl -fsSL https://raw.githubusercontent.com/DuongGFI/koohat/main/start.sh | bash
 ```
-Mở `http://localhost:1234` (máy Host) · người chơi LAN vào `http://<IP-LAN>:1234`.
+**Windows (PowerShell)**
+```powershell
+irm https://raw.githubusercontent.com/DuongGFI/koohat/main/start.ps1 | iex
+```
+Script tự dùng **Docker** nếu máy có, không thì dùng **Node**; xong sẽ in link `http://localhost:1234` để mở trên máy Host.
+
+> Máy Host cần có sẵn **Docker** *hoặc* **Node.js ≥18** (cài 1 lần). Chưa có thì script sẽ hiện link tải. Người chơi thì không cần cài gì — chỉ quét QR.
+
+### 🐳 Hoặc 1 lệnh Docker (nếu đã có Docker)
+```bash
+docker run -d -p 1234:1234 --name koohat ghcr.io/duonggfi/koohat
+```
+Để mã QR trỏ đúng cho điện thoại cùng WiFi, thêm IP LAN của máy:
+`-e PUBLIC_HOST=<IP-LAN>` (hoặc dùng nút "Mở cho người chơi từ xa" để khỏi cần IP).
+
+### 🛠️ Cách thủ công (clone repo về sửa/đóng góp)
+```bash
+git clone https://github.com/DuongGFI/koohat.git && cd koohat
+docker compose up -d                         # hoặc:
+npm run install:all && npm run build && npm start
+```
 Muốn chạy bền bỉ (tự khởi động lại): xem mục pm2 ở dưới.
 
 ### Cách dùng sau khi mở app
@@ -87,6 +97,10 @@ npm start                      # cd server && node src/index.js
 
 ```
 kahoot_local/
+├── Dockerfile                # build image (multi-stage: client build -> server runtime)
+├── docker-compose.yml        # chạy bằng docker compose
+├── start.sh / start.ps1      # script "1 dòng" (curl|bash / irm|iex): tự chọn Docker hoặc Node
+├── .github/workflows/        # CI: tự build & đẩy image lên ghcr.io/duonggfi/koohat
 ├── ecosystem.config.cjs      # cấu hình pm2 (CommonJS vì project là ESM)
 ├── package.json              # script tiện ích gọi xuống server/ và client/
 ├── spec.md                   # đặc tả gốc (bị cắt ở §4.3 — xem "Quyết định thiết kế")
