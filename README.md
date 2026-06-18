@@ -1,4 +1,4 @@
-# Kahoot Local 🎮
+# Kahoot Alternative 🎮
 
 **Game đố vui kiểu Kahoot, tự host trên máy của bạn.** Máy chủ trò (Host) chiếu câu hỏi lên màn hình lớn; người chơi dùng điện thoại quét mã QR (hoặc nhập mã PIN) để tham gia — không cần cài app, không cần đăng ký. Có chọn avatar, đặt cược điểm (x2), bảng xếp hạng, và nút mở cho người chơi ở xa qua Internet.
 
