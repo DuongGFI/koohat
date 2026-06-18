@@ -39,7 +39,7 @@ npm run install:all && npm run build && npm start
 Muốn chạy bền bỉ (tự khởi động lại): xem mục pm2 ở dưới.
 
 ### Cách dùng sau khi mở app
-1. **Tổ chức** → vào Quản lý câu hỏi, tạo câu hỏi theo **1 trong 2 cách**: (a) tải file Excel/CSV lên (có sẵn file mẫu để tải về điền), hoặc (b) dán link Kahoot công khai → chỉnh cấu hình phòng → **Bắt đầu tổ chức**.
+1. **Tổ chức** → vào Quản lý câu hỏi, tạo câu hỏi theo **1 trong 3 cách**: (a) tải file Excel/CSV lên (có sẵn file mẫu để tải về điền), (b) dán link Kahoot công khai, hoặc (c) nhập tay từng câu → chỉnh cấu hình phòng → **Bắt đầu tổ chức**.
 2. Người chơi mở trang chủ → **Tham gia chơi**, nhập mã PIN + biệt danh + chọn avatar (hoặc quét QR).
 3. Host bấm **Bắt đầu** và điều khiển từng câu.
 
@@ -246,7 +246,7 @@ Không trả lời:  delta = 0, không phạt
 
 ## 7. Tạo câu hỏi (`server/src/questions.js`)
 
-Có **2 cách** nạp câu hỏi vào phòng (xem trang Admin):
+Có **3 cách** tạo câu hỏi (xem trang Admin):
 
 **Cách 1 — Tải file lên (Excel/CSV).** Cấu trúc cột (header, không phân biệt hoa thường, hỗ trợ alias Việt/Anh — xem `HEADER_ALIASES`):
 
@@ -260,6 +260,8 @@ Có **2 cách** nạp câu hỏi vào phòng (xem trang Admin):
 - API: `POST /api/import/excel` (multipart, field `file`). Endpoint chấp nhận cả `.xlsx`, `.xls`, `.csv` — thư viện `xlsx` (SheetJS) tự nhận dạng định dạng.
 
 **Cách 2 — Dán link Kahoot công khai.** `POST /api/import/kahoot` `{url}` → trích UUID từ link share (`extractKahootUuid`), fetch `https://create.kahoot.it/rest/kahoots/<uuid>` (endpoint công khai không chính thức), map qua `mapKahootQuiz`. Trả thêm `{title, skipped, total}`. **Chỉ nhập câu `type:"quiz"` (1 đáp án đúng)** — slide/survey/open-ended/jumble/multi-select bị bỏ qua và đếm vào `skipped`. Text được strip HTML, `time(ms)→giây`, choices pad/cắt về đúng 4 (true/false → 2 đáp án + 2 ô trống). Chỉ chạy với Kahoot công khai (visible); private trả 401/403.
+
+**Cách 3 — Nhập tay từng câu.** Hoàn toàn ở client (`Admin.jsx`): nút "+ Thêm câu" tạo dòng trống, sửa nội dung/đáp án/đáp án đúng/thời gian ngay trên form. Không qua API; lưu tạm vào `localStorage` (`kahoot.questions`) như cả 2 cách trên, rồi nạp vào phòng khi bấm "Bắt đầu tổ chức".
 - REST chỉ *parse và trả JSON*; việc nạp vào phòng do client gọi tiếp `host:loadQuestions`.
 - **Lưu ý validation:** `Admin.jsx::startHosting` chấp nhận câu có **≥2 đáp án** không rỗng và đáp án đúng không rỗng (để hỗ trợ true/false từ Kahoot), không bắt buộc đủ 4 như trước.
 
@@ -323,7 +325,7 @@ cd server && node e2e-test.mjs       # 21 assertion: tạo phòng, join, avatar,
 - ✅ Đang chạy ổn định dưới pm2: app `kahoot-local`, cổng 1234, `instances:1 fork`, đã `pm2 save`.
 - ✅ Build client thành công, server phục vụ `client/dist`.
 - ✅ 21/21 e2e test pass.
-- ✅ Tạo câu hỏi 2 cách: tải file Excel/CSV (kéo-thả, có file mẫu) hoặc dán link Kahoot công khai.
+- ✅ Tạo câu hỏi 3 cách: tải file Excel/CSV (kéo-thả, có file mẫu), dán link Kahoot công khai, hoặc nhập tay từng câu.
 - ✅ Avatar emoji cho người chơi (chọn theo danh mục hoặc random) — hiện ở namecard sảnh + bảng xếp hạng + màn chờ của người chơi.
 - ✅ Người chơi thấy đề bài ngay từ giai đoạn PRE_QUESTION, và đề bài + chữ đáp án ở ACTIVE_QUESTION.
 - ✅ Ô nhập biệt danh/PIN dùng nền mờ + chữ trắng (tương phản rõ trên nền tối).
