@@ -2,7 +2,7 @@
 // không cần tài khoản / domain. Dùng cho tính năng "Mở cho người chơi từ xa".
 //
 // Binary cloudflared được gói `cloudflared` tự tải về lần đầu (cần internet).
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, writeFileSync, mkdirSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -10,7 +10,24 @@ let mod = null; // import lười gói cloudflared
 let current = null; // { url, instance }
 let starting = null; // Promise chống gọi trùng
 
+// Khi đóng gói thành .exe, thư mục gói KHÔNG ghi được. Trỏ binary cloudflared ra
+// ~/.koohat (ghi được) qua env CLOUDFLARED_BIN — gói cloudflared đọc env này.
+// PHẢI set TRƯỚC khi import gói (vì nó tính `bin` lúc nạp module).
+function configureBin() {
+  if (!process.env.CLOUDFLARED_BIN) {
+    const dir = path.join(os.homedir(), ".koohat");
+    try {
+      mkdirSync(dir, { recursive: true });
+    } catch {
+      /* ignore */
+    }
+    const exe = process.platform === "win32" ? "cloudflared.exe" : "cloudflared";
+    process.env.CLOUDFLARED_BIN = path.join(dir, exe);
+  }
+}
+
 async function loadMod() {
+  configureBin();
   if (!mod) mod = await import("cloudflared");
   return mod;
 }

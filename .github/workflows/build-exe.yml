@@ -1,0 +1,43 @@
+name: Build Windows .exe
+
+# Build file .exe trên máy Windows mỗi khi đẩy code lên main (hoặc chạy tay).
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docker-compose.yml"
+      - "Dockerfile"
+  workflow_dispatch:
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cài Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cài công cụ build (root: esbuild + pkg)
+        run: npm install
+
+      - name: Cài dependencies cho server + client
+        run: npm run install:all
+
+      - name: Build client + nhúng dist + gộp bundle CJS
+        run: npm run exe:prep
+
+      - name: Đóng gói thành koohat.exe
+        run: npm run exe:win
+
+      - name: Upload file .exe lên Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: koohat-windows
+          path: dist-exe/koohat.exe
+          if-no-files-found: error
+          retention-days: 30

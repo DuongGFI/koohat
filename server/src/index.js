@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import { spawn } from "node:child_process";
 import express from "express";
 import cors from "cors";
 import multer from "multer";
@@ -12,8 +13,18 @@ import { Server } from "socket.io";
 import { RoomManager, STATE } from "./rooms.js";
 import { parseExcelBuffer, fetchGoogleSheet, fetchKahoot } from "./questions.js";
 import { startTunnel, stopTunnel, tunnelStatus } from "./tunnel.js";
+import EMBEDDED_ASSETS from "./embedded-dist.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// import.meta.url hoạt động ở ESM (dev); khi esbuild gộp sang CJS nó rỗng nên
+// fileURLToPath sẽ ném lỗi — bắt lại và fallback (lúc đó dùng EMBEDDED_ASSETS,
+// không cần __dirname để đọc đĩa).
+const __dirname = (() => {
+  try {
+    return path.dirname(fileURLToPath(import.meta.url));
+  } catch {
+    return process.cwd();
+  }
+})();
 const PORT = process.env.PORT || 1234;
 
 // Địa chỉ LAN dùng để dựng URL tham gia trong mã QR. Vì máy Host có thể truy cập
@@ -239,12 +250,50 @@ io.on("connection", (socket) => {
   });
 });
 
-// ---- serve built client (production) --------------------------------------
+// ---- serve built client --------------------------------------------------
+// Ưu tiên assets nhúng trong RAM (bản .exe / bản bundle); nếu rỗng thì đọc đĩa (dev).
 
-const clientDist = path.join(__dirname, "..", "..", "client", "dist");
-if (fs.existsSync(clientDist)) {
-  app.use(express.static(clientDist));
-  app.get("*", (_req, res) => res.sendFile(path.join(clientDist, "index.html")));
+if (EMBEDDED_ASSETS && EMBEDDED_ASSETS.size) {
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    if (req.path.startsWith("/api") || req.path.startsWith("/socket.io")) return next();
+    const direct = EMBEDDED_ASSETS.get(req.path === "/" ? "/index.html" : req.path);
+    if (direct) {
+      res.type(direct.type);
+      return res.send(direct.body);
+    }
+    // SPA fallback: route không có đuôi file -> trả index.html
+    if (!path.extname(req.path)) {
+      const idx = EMBEDDED_ASSETS.get("/index.html");
+      if (idx) {
+        res.type(idx.type);
+        return res.send(idx.body);
+      }
+    }
+    next();
+  });
+} else {
+  const clientDist = path.join(__dirname, "..", "..", "client", "dist");
+  if (fs.existsSync(clientDist)) {
+    app.use(express.static(clientDist));
+    app.get("*", (_req, res) => res.sendFile(path.join(clientDist, "index.html")));
+  }
+}
+
+// Khi chạy dạng .exe đóng gói: tự mở trình duyệt cho người dùng không chuyên.
+const PACKAGED = !!process.pkg || process.env.KOOHAT_PACKAGED === "1";
+function openBrowser(url) {
+  try {
+    if (process.platform === "win32") {
+      spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" }).unref();
+    } else if (process.platform === "darwin") {
+      spawn("open", [url], { detached: true, stdio: "ignore" }).unref();
+    } else {
+      spawn("xdg-open", [url], { detached: true, stdio: "ignore" }).unref();
+    }
+  } catch {
+    /* ignore */
+  }
 }
 
 server.listen(PORT, "0.0.0.0", () => {
@@ -252,4 +301,9 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`  → Host (máy này):     http://localhost:${PORT}`);
   console.log(`  → Người chơi (LAN):   ${JOIN_BASE_URL}  ← dùng cho mã QR`);
   console.log(`  (đặt PUBLIC_HOST=<ip> để ép IP trong QR, PORT=<cổng> để đổi cổng)\n`);
+  if (PACKAGED) {
+    console.log(`  Đang mở trình duyệt... Nếu không tự mở, hãy vào: http://localhost:${PORT}`);
+    console.log(`  (Giữ cửa sổ này mở trong lúc chơi — đóng lại là tắt máy chủ.)\n`);
+    openBrowser(`http://localhost:${PORT}`);
+  }
 });

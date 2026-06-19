@@ -2,13 +2,23 @@
   "name": "kahoot-local",
   "version": "1.0.0",
   "private": true,
-  "description": "Kahoot clone chạy trong mạng LAN: Host trình chiếu, người chơi tham gia bằng điện thoại.",
+  "description": "Koohat — game đố vui kiểu Kahoot tự host trong mạng LAN: Host trình chiếu, người chơi tham gia bằng điện thoại.",
   "scripts": {
     "install:all": "cd server && npm install && cd ../client && npm install",
     "build": "cd client && npm run build",
     "start": "cd server && npm start",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "test": "cd server && node src/index.js & sleep 1.5 && cd server && node e2e-test.mjs"
+    "test": "cd server && node src/index.js & sleep 1.5 && cd server && node e2e-test.mjs",
+    "embed": "node scripts/embed-dist.mjs",
+    "bundle": "esbuild server/src/index.js --bundle --platform=node --format=cjs --target=node20 --outfile=build/koohat.cjs --external:bufferutil --external:utf-8-validate",
+    "exe:prep": "npm run build && npm run embed && npm run bundle",
+    "exe:win": "pkg build/koohat.cjs -t node20-win-x64 -o dist-exe/koohat.exe",
+    "exe:linux": "pkg build/koohat.cjs -t node20-linux-x64 -o dist-exe/koohat-linux",
+    "exe:macos": "pkg build/koohat.cjs -t node20-macos-x64 -o dist-exe/koohat-macos"
+  },
+  "devDependencies": {
+    "@yao-pkg/pkg": "^6.3.0",
+    "esbuild": "^0.24.0"
   }
 }
