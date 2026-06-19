@@ -8,8 +8,8 @@
 
 ## 🚀 Bắt đầu nhanh (cho người dùng)
 
-### 🪟 Windows: tải 1 file .exe rồi bấm chạy (KHÔNG cần cài gì)
-Hợp nhất cho người không rành kỹ thuật — không cần Node, không cần Docker:
+### 🪟 Windows: tải 1 file .exe rồi bấm chạy (KHÔNG cần cài gì) — DỄ NHẤT
+Hợp nhất cho người không rành kỹ thuật — không cần cài Node hay bất cứ phần mềm nào:
 1. Vào **[Actions](https://github.com/DuongGFI/koohat/actions/workflows/build-exe.yml)** → mở lần chạy mới nhất (dấu ✓ xanh).
 2. Kéo xuống mục **Artifacts** → tải **`koohat-windows`** (file .zip).
 3. Giải nén, **bấm đúp `koohat.exe`**. Một cửa sổ đen hiện ra và trình duyệt tự mở vào màn Host.
@@ -30,21 +30,13 @@ curl -fsSL https://raw.githubusercontent.com/DuongGFI/koohat/main/start.sh | bas
 ```powershell
 irm https://raw.githubusercontent.com/DuongGFI/koohat/main/start.ps1 | iex
 ```
-Script tự dùng **Docker** nếu máy có, không thì dùng **Node**; xong sẽ in link `http://localhost:1234` để mở trên máy Host.
+Script tự cài đặt và chạy giúp; xong sẽ in link `http://localhost:1234` để mở trên máy Host.
 
-> Máy Host cần có sẵn **Docker** *hoặc* **Node.js ≥18** (cài 1 lần). Chưa có thì script sẽ hiện link tải. Người chơi thì không cần cài gì — chỉ quét QR.
-
-### 🐳 Hoặc 1 lệnh Docker (nếu đã có Docker)
-```bash
-docker run -d -p 1234:1234 --name koohat ghcr.io/duonggfi/koohat
-```
-Để mã QR trỏ đúng cho điện thoại cùng WiFi, thêm IP LAN của máy:
-`-e PUBLIC_HOST=<IP-LAN>` (hoặc dùng nút "Mở cho người chơi từ xa" để khỏi cần IP).
+> Máy Host cần có sẵn **Node.js ≥18** (cài 1 lần tại https://nodejs.org). Người chơi thì không cần cài gì — chỉ quét QR.
 
 ### 🛠️ Cách thủ công (clone repo về sửa/đóng góp)
 ```bash
 git clone https://github.com/DuongGFI/koohat.git && cd koohat
-docker compose up -d                         # hoặc:
 npm run install:all && npm run build && npm start
 ```
 Muốn chạy bền bỉ (tự khởi động lại): xem mục pm2 ở dưới.
@@ -54,9 +46,9 @@ Muốn chạy bền bỉ (tự khởi động lại): xem mục pm2 ở dưới.
 2. Người chơi mở trang chủ → **Tham gia chơi**, nhập mã PIN + biệt danh + chọn avatar (hoặc quét QR).
 3. Host bấm **Bắt đầu** và điều khiển từng câu.
 
-> **Chơi từ xa (khác mạng WiFi)?** Ở màn chờ của Host có nút **🌐 "Mở cho người chơi từ xa (Internet)"**. Bấm vào, sau vài giây mã QR tự đổi sang một link Internet (Cloudflare tunnel) — người chơi ở bất kỳ đâu quét vào học được, không cần cùng WiFi, không cần cấu hình router. Cần máy Host có Internet. Lưu ý: ai có link đều vào được nên chỉ chia sẻ cho người chơi của bạn. Hoạt động cả khi chạy bằng Node lẫn Docker.
+> **Chơi từ xa (khác mạng WiFi)?** Ở màn chờ của Host có nút **🌐 "Mở cho người chơi từ xa (Internet)"**. Bấm vào, sau vài giây mã QR tự đổi sang một link Internet (Cloudflare tunnel) — người chơi ở bất kỳ đâu quét vào học được, không cần cùng WiFi, không cần cấu hình router. Cần máy Host có Internet. Lưu ý: ai có link đều vào được nên chỉ chia sẻ cho người chơi của bạn.
 
-> Đổi cổng: `PORT=8080` (Node) hoặc sửa `docker-compose.yml`. Mở firewall cổng tương ứng nếu người chơi không vào được (`sudo ufw allow 1234/tcp`).
+> Đổi cổng: đặt biến môi trường `PORT=8080`. Mở firewall cổng tương ứng nếu người chơi không vào được (`sudo ufw allow 1234/tcp`).
 
 ---
 
@@ -345,7 +337,7 @@ cd server && node e2e-test.mjs       # 21 assertion: tạo phòng, join, avatar,
 - ✅ Leaderboard hiển thị top 10, top 3 tô khung gradient vàng/bạc/đồng nổi bật.
 - ✅ Mã QR dùng IP LAN do server tự dò; màn sảnh không lộ địa chỉ dạng text.
 - ✅ Đóng gói 1 file `koohat.exe` (Node SEA) build tự động trên Windows runner, tải ở Artifacts — người dùng không cần cài gì.
-- ✅ "Mở cho người chơi từ xa" qua Cloudflare quick tunnel (nút ở lobby Host) — chơi khác mạng WiFi, chạy được cả Node lẫn Docker.
+- ✅ "Mở cho người chơi từ xa" qua Cloudflare quick tunnel (nút ở lobby Host) — chơi được dù khác mạng WiFi.
 - ⛔ Chưa làm: reconnect tự động cho player, âm thanh nền, dark/light toggle, lưu lịch sử trận.
 
 ### Lệnh pm2 hay dùng
