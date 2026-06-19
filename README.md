@@ -8,7 +8,18 @@
 
 ## 🚀 Bắt đầu nhanh (cho người dùng)
 
-### ⚡ Chạy bằng 1 dòng (dễ nhất)
+### 🪟 Windows: tải 1 file .exe rồi bấm chạy (KHÔNG cần cài gì)
+Hợp nhất cho người không rành kỹ thuật — không cần Node, không cần Docker:
+1. Vào **[Actions](https://github.com/DuongGFI/koohat/actions/workflows/build-exe.yml)** → mở lần chạy mới nhất (dấu ✓ xanh).
+2. Kéo xuống mục **Artifacts** → tải **`koohat-windows`** (file .zip).
+3. Giải nén, **bấm đúp `koohat.exe`**. Một cửa sổ đen hiện ra và trình duyệt tự mở vào màn Host.
+4. Người chơi quét QR / vào `http://<IP-LAN>:1234` bằng điện thoại.
+
+> Lần đầu chạy, Windows SmartScreen có thể cảnh báo "Windows protected your PC" (vì file chưa ký số). Bấm **More info → Run anyway**. Giữ cửa sổ đen mở trong lúc chơi — đóng là tắt máy chủ.
+>
+> File .exe được build tự động trên máy Windows của GitHub Actions mỗi khi có code mới (xem `.github/workflows/build-exe.yml`).
+
+### ⚡ Hoặc chạy bằng 1 dòng lệnh
 Mở **Terminal** (macOS/Linux) hoặc **PowerShell** (Windows), dán đúng 1 dòng rồi Enter:
 
 **macOS / Linux**
@@ -100,7 +111,9 @@ kahoot_local/
 ├── Dockerfile                # build image (multi-stage: client build -> server runtime)
 ├── docker-compose.yml        # chạy bằng docker compose
 ├── start.sh / start.ps1      # script "1 dòng" (curl|bash / irm|iex): tự chọn Docker hoặc Node
-├── .github/workflows/        # CI: tự build & đẩy image lên ghcr.io/duonggfi/koohat
+├── sea-config.json           # cấu hình Node SEA để đóng gói .exe
+├── scripts/embed-dist.mjs    # nhúng client/dist vào server/src/embedded-dist.js (phục vụ từ RAM)
+├── .github/workflows/        # CI: build-exe.yml (.exe Windows -> Artifacts) + docker-publish.yml (GHCR)
 ├── ecosystem.config.cjs      # cấu hình pm2 (CommonJS vì project là ESM)
 ├── package.json              # script tiện ích gọi xuống server/ và client/
 ├── spec.md                   # đặc tả gốc (bị cắt ở §4.3 — xem "Quyết định thiết kế")
@@ -331,6 +344,7 @@ cd server && node e2e-test.mjs       # 21 assertion: tạo phòng, join, avatar,
 - ✅ Ô nhập biệt danh/PIN dùng nền mờ + chữ trắng (tương phản rõ trên nền tối).
 - ✅ Leaderboard hiển thị top 10, top 3 tô khung gradient vàng/bạc/đồng nổi bật.
 - ✅ Mã QR dùng IP LAN do server tự dò; màn sảnh không lộ địa chỉ dạng text.
+- ✅ Đóng gói 1 file `koohat.exe` (Node SEA) build tự động trên Windows runner, tải ở Artifacts — người dùng không cần cài gì.
 - ✅ "Mở cho người chơi từ xa" qua Cloudflare quick tunnel (nút ở lobby Host) — chơi khác mạng WiFi, chạy được cả Node lẫn Docker.
 - ⛔ Chưa làm: reconnect tự động cho player, âm thanh nền, dark/light toggle, lưu lịch sử trận.
 
