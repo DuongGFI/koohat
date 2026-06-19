@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Cài công cụ build (root: esbuild + pkg)
+      - name: Cài công cụ build esbuild và pkg
         run: npm install
 
       - name: Cài dependencies cho server + client
