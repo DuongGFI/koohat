@@ -10,14 +10,13 @@
 
 ### 🪟 Windows: tải 1 file .exe rồi bấm chạy (KHÔNG cần cài gì) — DỄ NHẤT
 Hợp nhất cho người không rành kỹ thuật — không cần cài Node hay bất cứ phần mềm nào:
-1. Vào **[Actions](https://github.com/DuongGFI/koohat/actions/workflows/build-exe.yml)** → mở lần chạy mới nhất (dấu ✓ xanh).
-2. Kéo xuống mục **Artifacts** → tải **`koohat-windows`** (file .zip).
-3. Giải nén, **bấm đúp `koohat.exe`**. Một cửa sổ đen hiện ra và trình duyệt tự mở vào màn Host.
-4. Người chơi quét QR / vào `http://<IP-LAN>:1234` bằng điện thoại.
+1. Tải **[koohat.exe](https://github.com/DuongGFI/koohat/releases/latest/download/koohat.exe)** (link tải trực tiếp, luôn là bản mới nhất).
+2. **Bấm đúp `koohat.exe`**. Một cửa sổ đen hiện ra và trình duyệt tự mở vào màn Host.
+3. Người chơi quét QR / vào `http://<IP-LAN>:1234` bằng điện thoại.
 
 > Lần đầu chạy, Windows SmartScreen có thể cảnh báo "Windows protected your PC" (vì file chưa ký số). Bấm **More info → Run anyway**. Giữ cửa sổ đen mở trong lúc chơi — đóng là tắt máy chủ.
 >
-> File .exe được build tự động trên máy Windows của GitHub Actions mỗi khi có code mới (xem `.github/workflows/build-exe.yml`).
+> File .exe được build & test tự động trên máy Windows của GitHub Actions mỗi khi có code mới, rồi đăng lên [Releases](https://github.com/DuongGFI/koohat/releases/latest).
 
 ### ⚡ Hoặc chạy bằng 1 dòng lệnh
 Mở **Terminal** (macOS/Linux) hoặc **PowerShell** (Windows), dán đúng 1 dòng rồi Enter:
