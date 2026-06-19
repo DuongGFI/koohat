@@ -30,9 +30,9 @@ curl -fsSL https://raw.githubusercontent.com/DuongGFI/koohat/main/start.sh | bas
 ```powershell
 irm https://raw.githubusercontent.com/DuongGFI/koohat/main/start.ps1 | iex
 ```
-Script tự cài đặt và chạy giúp; xong sẽ in link `http://localhost:1234` để mở trên máy Host.
+Script **tự tải mọi thứ cần thiết** (file chạy sẵn, hoặc Node bản portable nếu máy chưa có — không cần quyền Admin) rồi mở trình duyệt vào `http://localhost:1234`.
 
-> Máy Host cần có sẵn **Node.js ≥18** (cài 1 lần tại https://nodejs.org). Người chơi thì không cần cài gì — chỉ quét QR.
+> **Không cần cài gì trước.** Người chơi cũng không cần cài gì — chỉ quét QR.
 
 ### 🛠️ Cách thủ công (clone repo về sửa/đóng góp)
 ```bash

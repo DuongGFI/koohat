@@ -13,6 +13,8 @@ on:
 jobs:
   build-windows-exe:
     runs-on: windows-latest
+    permissions:
+      contents: write # cần để tạo/cập nhật Release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,3 +64,17 @@ jobs:
           path: dist-exe/koohat.exe
           if-no-files-found: error
           retention-days: 30
+
+      - name: Phát hành lên Releases (tag latest)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Koohat - bản mới nhất
+          body: |
+            Tải **koohat.exe** rồi bấm đúp để chơi (Windows, không cần cài gì).
+            File được build & test tự động trên Windows runner.
+          files: |
+            dist-exe/koohat.exe
+            build/koohat.cjs
+          make_latest: true
