@@ -31,8 +31,29 @@ jobs:
       - name: Build client + nhúng dist + gộp bundle CJS
         run: npm run exe:prep
 
-      - name: Đóng gói thành koohat.exe
-        run: npm run exe:win
+      - name: Tạo blob SEA
+        run: node --experimental-sea-config sea-config.json
+
+      - name: Tạo koohat.exe (node.exe + inject blob)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist-exe | Out-Null
+          Copy-Item (Get-Command node).Source dist-exe/koohat.exe
+          npx --yes postject dist-exe/koohat.exe NODE_SEA_BLOB build/sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
+
+      - name: Kiểm tra nhanh koohat.exe (boot + health)
+        shell: pwsh
+        run: |
+          $env:PORT = "1239"
+          $p = Start-Process -FilePath dist-exe/koohat.exe -PassThru
+          Start-Sleep -Seconds 6
+          try {
+            $r = Invoke-RestMethod -Uri "http://127.0.0.1:1239/api/health" -TimeoutSec 8
+            if (-not $r.ok) { throw "health không ok" }
+            Write-Host "OK: exe chạy được, health = $($r | ConvertTo-Json -Compress)"
+          } finally {
+            Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          }
 
       - name: Upload file .exe lên Artifacts
         uses: actions/upload-artifact@v4

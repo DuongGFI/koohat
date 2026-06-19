@@ -281,7 +281,12 @@ if (EMBEDDED_ASSETS && EMBEDDED_ASSETS.size) {
 }
 
 // Khi chạy dạng .exe đóng gói: tự mở trình duyệt cho người dùng không chuyên.
-const PACKAGED = !!process.pkg || process.env.KOOHAT_PACKAGED === "1";
+// Nhận diện qua tên file thực thi (pkg/SEA → koohat.exe; dev → node/node.exe).
+const exeName = path.basename(process.execPath).toLowerCase();
+const PACKAGED =
+  !!process.pkg ||
+  process.env.KOOHAT_PACKAGED === "1" ||
+  (exeName !== "node" && exeName !== "node.exe");
 function openBrowser(url) {
   try {
     if (process.platform === "win32") {
