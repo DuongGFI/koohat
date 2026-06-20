@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths-ignore:
       - "**.md"
+      - "media/**"
       - "docker-compose.yml"
       - "Dockerfile"
   workflow_dispatch:

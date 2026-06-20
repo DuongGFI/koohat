@@ -4,6 +4,21 @@
 
 👉 **Bạn chỉ muốn dùng?** Đọc mục **🚀 Bắt đầu nhanh** ngay dưới đây là đủ — bỏ qua các phần đánh số (dành cho lập trình viên).
 
+## 📸 Ảnh chụp màn hình
+
+<table>
+  <tr>
+    <td align="center" width="50%"><b>Trang chủ</b><br><img src="media/trang-chu.png" width="400" alt="Trang chủ Koohat"></td>
+    <td align="center" width="50%"><b>Quản lý câu hỏi</b><br><img src="media/quan-ly-cau-hoi.png" width="400" alt="Quản lý câu hỏi"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Màn chờ — Host (PIN + QR)</b><br><img src="media/tham-gia-host.png" width="400" alt="Màn chờ Host"></td>
+    <td align="center"><b>Tham gia trên điện thoại</b><br><img src="media/tham-gia-player.jpg" width="200" alt="Tham gia trên điện thoại"></td>
+  </tr>
+</table>
+
+<p align="center"><b>Đang thi đấu</b> — người chơi bấm trên điện thoại, Host chiếu lên màn lớn<br><img src="media/thi-dau.jpg" width="320" alt="Đang thi đấu"></p>
+
 ---
 
 ## 🚀 Bắt đầu nhanh (cho người dùng)
